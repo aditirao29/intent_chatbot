@@ -20,13 +20,13 @@ def clean(text):
     text = re.sub(r"\s+"," ",text).strip()
     return text
 
-email = "support@yourcompany.com"
+emailid = "support@company.com"
 phone = "+1-800-123-4567"
-order_link = "https://yourcompany.com/track-order"
-refund_link = "https://yourcompany.com/refund"
-prod_link = "https://yourcompany.com/products"
-acc_link = "https://yourcompany.com/account"
-help_link = "https://yourcompany.com/help"
+order_link = "https://company.com/track-order"
+refund_link = "https://company.com/refund"
+prod_link = "https://company.com/products"
+acc_link = "https://company.com/account"
+help_link = "https://company.com/help"
 refund_keywords = {"refund","money","return","returned","cash","credit","credited","amount","repay","reimbursement","reverse","reversed","chargeback"}
 order_keywords = {"order","track","delivery","arrive","arrived","shipped","dispatch","dispatched","package","status"}
 keywords = {"order","track","delivery","arrive","arrived","package","dispatch","dispatched","shipped","refund","money","return","credited",
@@ -38,38 +38,92 @@ order = le.transform(["order_status"])[0] if "order_status" in le.classes_ else 
 refund = le.transform(["refund_query"])[0] if "refund_query" in le.classes_ else None
 responses = {
     "order_status": [
-        "You can track the current status of your order using this link:\n"
+        "I can help you check your order status.\n\n"
+        "If you have your order ID, you can track it here:\n"
         f"{order_link}\n\n"
-        "If your order is delayed or the status has not updated, you may:\n"
-        f"• Contact our support team at {email}\n"
-        f"• Call us at {phone} for immediate assistance."
+        "Orders usually take 2-5 business days to ship. If it's past that, let me know.",
+
+        "Your order may still be processing or already shipped.\n\n"
+        "You can view real-time updates using this link:\n"
+        f"{order_link}\n\n"
+        f"If the status hasn't changed in 48 hours, you can contact {emailid}.",
+
+        "Let me guide you on your delivery.\n\n"
+        "• Processing: Order is being prepared\n"
+        "• Shipped: On the way\n"
+        "• Delivered: Successfully delivered\n\n"
+        f"Track here: {order_link}"
     ],
 
     "refund_query": [
-        "You can review our refund policy and submit a refund request here:\n"
-        f"{refund_link}\n\n"
-        "If you are eligible, you will receive an email confirmation within 24-48 hours.\n"
-        f"For further assistance, contact {email} or call {phone}."
+        "Here's a quick summary of our refund policy:\n\n"
+        "• Refunds are available within 7 days of delivery\n"
+        "• The product must be unused and in original packaging\n"
+        "• Refunds are processed within 5-7 business days\n\n"
+        f"You can submit a request here:\n{refund_link}",
+
+        "To request a refund, please follow these steps:\n\n"
+        "1. Go to your orders section\n"
+        "2. Select the item\n"
+        "3. Click on 'Request Refund'\n\n"
+        "Once approved, the amount is credited back to your original payment method.",
+
+        "I understand refunds can be urgent.\n\n"
+        "Refunds are accepted within 7 days after delivery if the item is unused.\n"
+        "After approval, the amount is credited within 5-7 working days.\n\n"
+        f"If you face issues, contact us at {emailid}."
     ],
 
     "product_details": [
-        "You can find detailed information, specifications, and pricing for our products here:\n"
-        f"{prod_link}\n\n"
-        f"If you need further help, contact {email} or visit {help_link}."
+        "Here's what you can usually find about our products:\n\n"
+        "• Price and offers\n"
+        "• Technical specifications\n"
+        "• Warranty details\n\n"
+        f"Browse products here:\n{prod_link}",
+
+        "If you're looking for size, color, features, or compatibility details,\n"
+        f"you can check the full product page here:\n{prod_link}\n\n"
+        "If something is unclear, I can help explain it.",
+
+        "Each product page contains:\n\n"
+        "• Description\n"
+        "• Specifications\n"
+        "• Customer reviews\n\n"
+        f"Visit: {prod_link}"
     ],
 
     "tech_support": [
-        "For technical issues related to login, OTP, or app problems, please visit:\n"
-        f"{acc_link}\n\n"
-        "If the problem continues, you may:\n"
-        f"• Email our technical team at {email}\n"
-        f"• Call {phone} for urgent support."
+        "For login or OTP issues, try these steps first:\n\n"
+        "• Check your internet connection\n"
+        "• Wait 30 seconds before requesting a new OTP\n"
+        "• Make sure your phone number is correct\n\n"
+        f"If it still fails, visit: {acc_link}",
+
+        "If the app or website is not responding:\n\n"
+        "• Refresh the page\n"
+        "• Clear browser cache\n"
+        "• Try again after a few minutes\n\n"
+        "Temporary server issues usually resolve quickly.",
+
+        "Technical issues can happen sometimes.\n\n"
+        "If basic troubleshooting doesn't work, our technical team can help you.\n"
+        f"Email: {emailid}\n"
+        f"Phone: {phone}"
     ],
 
     "fallback": [
-        "I can assist you with order tracking, refunds, product information, or technical support.\n\n"
-        f"Please visit our help center at {help_link}\n"
-        f"Or contact us at {email}."
+        "I can help you with:\n\n"
+        "• Order tracking\n"
+        "• Refunds\n"
+        "• Product details\n"
+        "• Technical issues\n\n"
+        "Please tell me what you're facing.",
+
+        "I'm here to assist you with your order, payment, or technical problems.\n\n"
+        "Could you describe your issue in a bit more detail?",
+
+        "I didn't fully understand that.\n\n"
+        "You can ask about order status, refunds, products, or login issues."
     ]
 }
 
@@ -102,7 +156,8 @@ def predict_intent(text,min_conf=0.35,margin=0.15):
 def generate_response(intent):
     if intent not in responses:
         return "I'm not sure how to help with that."
-    return random.choice(responses[intent])
+    options = responses.get(intent, responses["fallback"])
+    return random.choice(options)
 
 @app.route("/")
 def index():
@@ -117,4 +172,4 @@ def predict():
     return jsonify({"intent":result["intent"],"confidence":round(result["confidence"],3),"response":reply})
 
 if __name__=="__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0",port=5000)
