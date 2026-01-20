@@ -91,3 +91,26 @@ Some intents handled by the chatbot:
 - Product detail queries
 - Technical support
 - Fallback
+
+## Screenshots
+<p align="center">
+  <img src="Screenshots/first.png" width="340" />
+  <img src="Screenshots/second.png" width="330" />
+</p>
+
+---
+
+## Deployment
+This project can be deployed on platforms such as:
+- Render
+- Railway
+- Heroku
+
+Make sure to:
+- Add a requirements.txt file
+- Use gunicorn for production
+- Configure the correct start command
+
+---
+## Conclusion
+This project demonstrates an end-to-end pipeline for building and deploying an intent-based chatbot using deep learning and Flask.
